@@ -1,5 +1,5 @@
 #include "User.hpp"
-
+#include "UserException.hpp"
 
 User::User()
 {
@@ -52,7 +52,7 @@ unsigned int User::CheckoutCount() const
 	return m_borrowedCount;
 }
 
-//CheckOut Function-Checks out a book for the user
+
 bool User::CheckOut(const string& bookId)
 {
 	bool resized;
@@ -88,24 +88,30 @@ bool User::CheckIn(const string& bookId)
 	
 	for (unsigned int i = 0; i < m_arraySize; i++)
 	{
-		if (bookId == m_borrowedBooksList[i])
+		try
 		{
-			m_borrowedBooksList[i] = m_borrowedBooksList[lastBookInArray];
-			m_borrowedBooksList[lastBookInArray] = " ";
-			m_arraySize -= 1;
-			m_borrowedCount -= 1;
+			if (bookId == m_borrowedBooksList[i])
+			{
+				m_borrowedBooksList[i] = m_borrowedBooksList[lastBookInArray];
+				m_borrowedBooksList[lastBookInArray] = " ";
+				m_arraySize -= 1;
+				m_borrowedCount -= 1;
 
-			if (m_arraySize == 0)
-			{
-				destroyList();
-			}
-			else
-			{
-				return resizeArray();
+				if (m_arraySize == 0)
+				{
+					destroyList();
+				}
+				else
+				{
+					return resizeArray();
+				}
 			}
 		}
+		catch (UserException e)
+		{
+			cerr << "Error: Book was not checked out!" << e.What() << endl;
+		}
 	}
-
 }
 
 
@@ -206,6 +212,27 @@ istream& operator>>(istream& in, User& item)
 	return in;
 }
 
+User& User::operator=(const User&rhs)
+{
+	if (this == &rhs)
+	{
+		return *this;
+	}
+	m_id = rhs.m_id;
+	m_firstName = rhs.m_firstName;
+	m_lastName = rhs.m_lastName;
+	m_borrowedCount = rhs.m_borrowedCount;
+
+	if (m_arraySize < rhs.m_arraySize)
+	{
+		resizeArray();
+	}
+	m_arraySize = rhs.m_arraySize;
+	for (unsigned int i = 0; i < m_arraySize; i++)
+	{
+		m_borrowedBooksList[i] = rhs.m_borrowedBooksList[i];
+	}
+}
 
 // Management functions
 void User::createList()
@@ -215,14 +242,13 @@ void User::createList()
 		m_borrowedCount = 0;
 		m_arraySize = 5;
 		m_borrowedBooksList = new string[m_arraySize];
-		if (m_borrowedBooksList == NULL)
-		{
-			throw 1;
-		}
 	}
-	catch(int e)
+	catch(UserException e)
 	{
-		cout << "Can't get memory for checking out new item!";
+		cerr << "Can't get memory for creating a new list, see createList():" << e.What() << endl;
+		m_borrowedBooksList = NULL;
+		m_borrowedCount = 0;
+		m_arraySize = 0;
 	}
 
 }
@@ -239,12 +265,18 @@ bool User::resizeArray()
 {
 	int increasedSize;
 	increasedSize = m_arraySize * 2;
-
 	string* tempArray = new string[increasedSize];
-		
-	for (unsigned int i = 0; i < m_arraySize; i++)
+
+	try
 	{
-		tempArray[i] = m_borrowedBooksList[i];
+		for (unsigned int i = 0; i < m_arraySize; i++)
+		{
+			tempArray[i] = m_borrowedBooksList[i];
+		}
+	}
+	catch (UserException e)
+	{
+		cerr << "Error allocating memory: Couldn't Resize the Array:" << e.What() << endl;
 	}
 
 	delete[] m_borrowedBooksList;

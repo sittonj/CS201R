@@ -42,6 +42,8 @@ public:
 	friend ostream& operator<<(ostream& out, const User& item);
 	friend istream& operator>>(istream& out, User& item);
 
+	User& operator=(const User&rhs);
+
 	void createList();
 	void destroyList();
 	void clear();

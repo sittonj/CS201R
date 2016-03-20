@@ -1,3 +1,7 @@
+//Justin Sitton
+//3/20/2016
+//Project 4
+
 #include "User.hpp"
 #include <fstream>
 #include <iostream>
@@ -16,10 +20,11 @@ int main()
 	ofstream CheckOutFOut("Output.txt");
 
 
+
+	//Readin data
 	UsersFin >> buffer;
 	UsersFin >> numOfUsers;
 
-	//Readin data
 	User* members = new User[numOfUsers];
 
 	for (unsigned int i = 0; i < numOfUsers; i++)
@@ -62,7 +67,6 @@ int main()
 
 	//Read in Returned Books
 	bool checkedOut;
-	cout << "CHECKING IN BOOKS" << endl;
 	CheckInFin >> buffer;
 	while (CheckInFin.good())
 	{
@@ -86,6 +90,8 @@ int main()
 		CheckOutFOut << members[i] << endl;
 	}
 
+
+	//Final Clean up
 	delete[] members;
 
 	UsersFin.close();
