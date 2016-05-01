@@ -28,9 +28,8 @@ void WebCreator::ReadStyle(const string& stylePage)
 	ifstream styleIn(stylePage);
 	Style object;
 
-	while (styleIn.good())
+	while (styleIn >> object)
 	{
-		styleIn >> object;
 		m_styleList.push_back(object);
 	}
 	
@@ -41,11 +40,12 @@ void WebCreator::ReadPage(const string& pagePath)
 {
 	ifstream pageIn(pagePath);
 	string label;
+	string buffer;
 
 
-	while (pageIn.good())
+	while (pageIn >> label)
 	{
-		pageIn >> label;
+		
 		IElement* element;
 		element = NULL;
 		
